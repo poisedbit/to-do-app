@@ -15,7 +15,7 @@
     <main>
         <section id="task-todo">
             <div class="task-container">
-
+                <button id="btn-task-new">Add a task</button>
             </div>
         </section>
         <section id="task-in-progress">
@@ -28,6 +28,15 @@
                 
             </div>
         </section>
+        <div id="modal" style="visibility: hidden;">
+            <div id="modal-inner">
+                <div id="modal-content">
+                    <input name="modal-title" id="modal-title" type="text" placeholder="title">
+                    <textarea name="modal-description" id="modal-description" placeholder="write a description"></textarea>
+                    <button id="btn-ok">Ok</button>
+                </div>
+            </div>
+        </div>
     </main>
     <footer>
 
