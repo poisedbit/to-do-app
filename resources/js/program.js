@@ -1,10 +1,5 @@
-import { openModal, closeModal } from "./modal";
+import { openModal, closeModal, modal, btnTaskNew, btnOk } from "./modal.js";
 
-taskList = {
-    todo: [],
-    inProgress: [],
-    complete: []
-}
-
-openModal();
-closeModal(taskList.todo.length);
+btnTaskNew.addEventListener('click', openModal);
+modal.addEventListener('click', closeModal);
+btnOk.addEventListener('click', closeModal);

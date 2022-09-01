@@ -1,45 +1,59 @@
+import { taskList } from "./task-list.js";
 import { Task } from "./task.js";
 
 const modal = document.getElementById('modal');
 const modalTitle = document.getElementById('modal-title');
 const modalDescription = document.getElementById('modal-description');
-const btnOk = document.getElementId('btn-ok');
+const btnOk = document.getElementById('btn-ok');
+const btnTaskNew = document.getElementById('btn-task-new');
 let taskItemId;
 let numStatus;
 
-function openModal() {
-    document.addEventListener('click', (e) => {
-        if (e.target === document.getElementById('btn-task-new')) {
-            modalTitle.value = '';
-            modalDescription.value = '';
-            modal.style.visibility = 'visible';
-            numStatus = 0;
-        } else if (e.target.classList.contains('task-item')) {
-            modalTitle.value = e.target.getElementsByClassName('task-item-title')[0];
-            modalDescription.value = e.target.getElementsByClassName('task-item-description')[0];
-            modal.style.visibility = 'visible';
-            taskItemId = e.target.id;
-            numStatus = 1;
+function openModal(e) {
+    if (e.target == btnTaskNew) {
+        modalTitle.value = '';
+        modalDescription.value = '';
+        modal.style.visibility = 'visible';
+        numStatus = 0;
+    } else {
+        console.log(e.target);
+        let item;
+        switch (e.target.className) {
+            case 'task-item':
+                item = e.target;
+                break;
+            case 'task-item-inner':
+                item = e.target.parentElement;
+                break;
+            default:
+                item = e.target.parentElement.parentElement;
+                break;
         }
-    });
+        modalTitle.value = item.querySelector('.task-item-title').innerHTML;
+        modalDescription.value = item.querySelector('.task-item-description').innerHTML;
+        modal.style.visibility = 'visible';
+        taskItemId = item.id;
+        numStatus = 1;
+    }
 }
 
-function closeModal(id) {
-    document.addEventListener('click', (e) => {
-        if (e.target === modal || e.target === btnOk) {
-            const title = modalTitle;
-            const description = modalDescription;
-            let taskItem;
-            if (numStatus === 0) {
-                taskItem = new Task(title, description, id);
-                taskItem.appendTask();
-            } else {
-                taskItem = document.getElementById(taskItemId);
-                taskItem.getElementsByClassName('task-item-title')[0].innerHTML = title;
-                taskItem.getElementsByClassName('task-item-description')[0].innerHTML = description;
-            }
+function closeModal(e) {
+    if (e.target == modal || e.target === btnOk) {
+        const title = modalTitle.value;
+        const description = modalDescription.value;
+        const  id = taskList.todo.length;
+        if (numStatus === 0) {
+            const item = new Task(title, description, id);
+            taskList.addTodo(item);
+            item.appendTask();
+            modal.style.visibility = 'hidden';
+        } else {
+            const item = document.getElementById(taskItemId);
+            item.querySelector('.task-item-title').innerHTML = title;
+            item.querySelector('.task-item-description').innerHTML = description;
+            modal.style.visibility = 'hidden';
         }
-    });
+    }
 }
 
-export { openModal, closeModal }
+export { openModal, closeModal, modal, btnOk, btnTaskNew }
