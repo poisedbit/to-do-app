@@ -1,59 +1,64 @@
+// @ts-check
+
 import { taskList } from "./task-list.js";
 import { Task } from "./task.js";
 
-const modal = document.getElementById('modal');
-const modalTitle = document.getElementById('modal-title');
-const modalDescription = document.getElementById('modal-description');
-const btnOk = document.getElementById('btn-ok');
-const btnTaskNew = document.getElementById('btn-task-new');
-let taskItemId;
+let item;
+let itemElement;
 let numStatus;
 
-function openModal(e) {
-    if (e.target == btnTaskNew) {
-        modalTitle.value = '';
-        modalDescription.value = '';
-        modal.style.visibility = 'visible';
-        numStatus = 0;
-    } else {
-        console.log(e.target);
-        let item;
-        switch (e.target.className) {
-            case 'task-item':
-                item = e.target;
-                break;
-            case 'task-item-inner':
-                item = e.target.parentElement;
-                break;
-            default:
-                item = e.target.parentElement.parentElement;
-                break;
+const modal = {
+    element: document.getElementById('modal'),
+    title: document.getElementById('modal-title'),
+    description: document.getElementById('modal-description'),
+
+    set elementContent(item) {
+        this.title.value =  item.title;
+        this.description.value = item.description;
+        this.element.style.visibility = 'visible';
+    },
+
+    open: function(e) {
+        if (e.target == document.getElementById('btn-new-task')) {
+            modal.elementContent = new Task('', '', null);
+            numStatus = 0;
+        } else if (e.target.className != 'btn-remove-task') {
+            itemElement = e.target;
+
+            while (itemElement.className != 'task-item') {
+                itemElement = itemElement.parentElement;
+            }
+
+            item = taskList.getItem(itemElement.id);
+            modal.elementContent = item;
+            numStatus = 1;
         }
-        modalTitle.value = item.querySelector('.task-item-title').innerHTML;
-        modalDescription.value = item.querySelector('.task-item-description').innerHTML;
-        modal.style.visibility = 'visible';
-        taskItemId = item.id;
-        numStatus = 1;
+    },
+
+    close: function(e) {
+        if (e.target == modal.element || e.target == document.getElementById('btn-ok')) {
+            switch (numStatus) {
+                case 0:
+
+                    const newItem = new Task(modal.title.value, modal.description.value, taskList.todo.length);
+                    taskList.addTodo(newItem);
+                    document.getElementById('task-todo').querySelector('.task-container').appendChild(newItem.element);
+                    modal.element.style.visibility = 'hidden';
+                    break;
+
+                case 1:
+                    
+                    taskList.updateItem(itemElement.id, modal.title.value, modal.description.value);
+                    itemElement.querySelector('.task-item-title').innerHTML = modal.title.value;
+                    itemElement.querySelector('.task-item-description').innerHTML = modal.description.value;
+                    modal.element.style.visibility = 'hidden';
+                    break;
+
+                default:
+                    break;
+            }
+        }
     }
 }
 
-function closeModal(e) {
-    if (e.target == modal || e.target === btnOk) {
-        const title = modalTitle.value;
-        const description = modalDescription.value;
-        const  id = taskList.todo.length;
-        if (numStatus === 0) {
-            const item = new Task(title, description, id);
-            taskList.addTodo(item);
-            item.appendTask();
-            modal.style.visibility = 'hidden';
-        } else {
-            const item = document.getElementById(taskItemId);
-            item.querySelector('.task-item-title').innerHTML = title;
-            item.querySelector('.task-item-description').innerHTML = description;
-            modal.style.visibility = 'hidden';
-        }
-    }
-}
-
-export { openModal, closeModal, modal, btnOk, btnTaskNew }
+export { modal }

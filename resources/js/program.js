@@ -1,5 +1,11 @@
-import { openModal, closeModal, modal, btnTaskNew, btnOk } from "./modal.js";
+// @ts-check
 
-btnTaskNew.addEventListener('click', openModal);
-modal.addEventListener('click', closeModal);
-btnOk.addEventListener('click', closeModal);
+import { modal } from "./modal.js";
+
+function main() {
+    document.getElementById('btn-new-task').addEventListener('click', modal.open);
+    modal.element.addEventListener('click', modal.close);
+    document.getElementById('btn-ok').addEventListener('click', modal.close);
+}
+
+main();
