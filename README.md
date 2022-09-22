@@ -1,3 +1,3 @@
 # ToDo App
 
-Simple ToDo app with a 3-column design for "ToDo", "In-progress", and "Completed" tasks.
+Simple ToDo app that features a kanban board in its simplest form.

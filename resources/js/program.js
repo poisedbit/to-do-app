@@ -1,11 +1,25 @@
-// @ts-check
+"use strict";
 
-import { modal } from "./modal.js";
+import Column from "./view/column";
+import modal from "./view/modal";
 
 function main() {
-    document.getElementById('btn-new-task').addEventListener('click', modal.open);
-    modal.element.addEventListener('click', modal.close);
-    document.getElementById('btn-ok').addEventListener('click', modal.close);
+
+    const App = {
+        todo: new Column('task-todo'),
+        inProgress: new Column('task-in-progress'),
+        complete: new Column('task-complete')
+    }
+
+    modal.setEvents(() => {
+        const data = modal.close();
+
+        App[data.columnId].renderNewItem(data);
+
+        if (data.isNew !== true) {
+            App[data.columnId].updateItem(data);
+        }
+    })
 }
 
 main();

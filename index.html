@@ -14,17 +14,17 @@
     <main>
         <section id="task-todo">
             <div class="task-container">
-                <button id="btn-new-task">Add a task</button>
+                <button class="btn-add-task" type="button">Add a task</button>
             </div>
         </section>
         <section id="task-in-progress">
             <div class="task-container">
-                
+                <button class="btn-add-task" type="button">Add a task</button>
             </div>
         </section>
         <section id="task-complete">
             <div class="task-container">
-                
+                <button class="btn-add-task" type="button">Add a task</button>
             </div>
         </section>
     </main>
@@ -32,9 +32,9 @@
     <div id="modal" style="visibility: hidden;">
         <div id="modal-inner">
             <div id="modal-content">
-                <input name="modal-title" id="modal-title" type="text" placeholder="title">
-                <textarea name="modal-description" id="modal-description" placeholder="write a description"></textarea>
-                <button id="btn-ok">Ok</button>
+                <div id="modal-title" contenteditable="true" placeholder="title"></div>
+                <div id="modal-description" contenteditable="true" placeholder="write a description"></div>
+                <button id="btn-modal-ok">Ok</button>
             </div>
         </div>
     </div>
