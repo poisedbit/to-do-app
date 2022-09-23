@@ -1,25 +1,31 @@
 "use strict";
 
-import Column from "./view/column";
-import modal from "./view/modal";
+import test from "./test.js";
+import Column from "./view/column.js";
+import modal from "./view/modal.js";
 
 function main() {
+    test();
 
-    const App = {
-        todo: new Column('task-todo'),
-        inProgress: new Column('task-in-progress'),
-        complete: new Column('task-complete')
-    }
+    const columns = [
+        new Column('todo', 'task-todo'),
+        new Column('inProgress', 'task-in-progress'),
+        new Column('complete', 'task-complete')
+    ]
 
-    modal.setEvents(() => {
-        const data = modal.close();
+    modal.setEvents((e) => {
+        if (e.target.id != 'modal-inner') {
+            const data = modal.close();
 
-        App[data.columnId].renderNewItem(data);
-
-        if (data.isNew !== true) {
-            App[data.columnId].updateItem(data);
+            if (data.isNew) {
+                columns.find(c => c.id === data.columnId).addNewItem(data);
+            } else {
+                columns.find(c => c.id === data.columnId).updateItem(data);
+            }
         }
-    })
+    });
+
+    columns.forEach(c => c.renderItems());
 }
 
 main();

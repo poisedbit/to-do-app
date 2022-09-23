@@ -1,18 +1,23 @@
+import ID from "./id-log.js";
+
 export default class Data {
-    static name = 'task-items';
+    static _keyName = 'task-items';
+
     static insertItem(item, columnId) {
-        const data = load(this.name);
+        const data = load(this._keyName);
         const column = data[columnId];
 
         if (!column) {
             data[columnId] = [];
         }
-
+        
         column.push(item);
-        save(this.name, data);
+        ID.insertID(item.id);
+        save(this._keyName, data);
     }
+    
     static getItems(columnId) {
-        const data = load(this.name);
+        const data = load(this._keyName);
         const column = data[columnId];
 
         if (!column) {
@@ -21,27 +26,23 @@ export default class Data {
 
         return column;
     }
+
     static updateItem(id, columnId, newContent) {
-        const data = load(this.name);
+        const data = load(this._keyName);
         const column = data[columnId];
 
-        column[id].content = newContent;
-        save(this.name, data);
+        column.find(item => item.id === id).content = newContent;
+        save(this._keyName, data);
     }
+
     static deleteItem(id, columnId) {
-        const data = load(this.name);
+        const data = load(this._keyName);
         const column = data[columnId];
+        const index = column.findIndex(item => item.id === id);
 
-        column.forEach( (element, index, list) => {
-
-            if (element.id > id) {
-                list[index].id -= 1;
-            }
-
-        });
-
-        column.splice(id, 1);
-        save(this.name, data);
+        column.splice(index, 1);
+        ID.deleteID(id);
+        save(this._keyName, data);
     }
 }
 
@@ -64,5 +65,3 @@ function save(keyName, data) {
     
     localStorage.setItem(keyName, jsonData);
 }
-
-export { Data }

@@ -1,12 +1,16 @@
 "use strict";
 
-const modal = {}
+const modal = {
+    elements: {
+        root: document.getElementById('modal'),
+        content: {
+            title: document.getElementById('modal-title'),
+            description: document.getElementById('modal-description')
+        },
+        btnOk: document.getElementById('btn-modal-ok'),
+    }
+}
 
-modal.elements = {}
-modal.elements.root = document.getElementById('modal');
-modal.elements.content.title = modal.elements.root.querySelector('#modal-title');
-modal.elements.content.description = modal.elements.root.getElementById('#modal-description');
-modal.elements.btnOk = modal.elements.root.querySelector('#btn-modal-ok');
 modal.item = {}
 
 modal.getContent = () => {
@@ -21,7 +25,7 @@ modal.setContent = (title, description) => {
     modal.elements.content.description.textContent = description;
 }
 
-modal.setEvents = () => {
+modal.setEvents = (func) => {
     modal.elements.root.addEventListener('click', func);
     modal.elements.btnOk.addEventListener('click', func);
 }
@@ -29,20 +33,23 @@ modal.setEvents = () => {
 modal.show = (view) => {
     switch (view) {
         case 0: 
-            modal.element.style.visibility = 'hidden';
+            modal.elements.root.style.visibility = 'hidden';
+            return console.log('modal closed');
         case 1:
-            modal.element.style.visibility = 'visible';
+            modal.elements.root.style.visibility = 'visible';
+            return console.log('modal opened');
     }
 }
 
-modal.open = (columnId, id = null, content = null) => {
+modal.open = (columnId, item = null) => {
     modal.setContent('', '');
     modal.item.columnId = columnId;
     modal.item.isNew = true;                     // true if a new item's being created, false otherwise
 
-    if (content != null) {
-        modal.setContent(content.title, content.description)
-        modal.item.id = id;
+    if (item != null) {
+        
+        modal.setContent(item.content.title, item.content.description)
+        modal.item.id = item.id;
         modal.item.isNew = false;
     }
 

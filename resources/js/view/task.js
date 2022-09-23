@@ -1,52 +1,22 @@
 "use strict";
 
-import Data from "../api/data.js";
-import modal from "./modal.js";
+import ID from "../api/id-log.js";
 
 export default class Task {
-    constructor (content, columnId) {
+    constructor (content, columnId, id = null) {
         this.content = content;
         this.columnId = columnId;
-        this.id = Data.getItems(columnId).length;
-
-        this.elements.root = this.element;
-        this.elements.title = this.elements.root.querySelector('.task-item-title');
-        this.elements.description = this.elements.root.querySelector('.task-item-description');
-        this.elements.btnDeleteTask = this.elements.root.querySelector('.btn-delete-task');
-
-        this.setEvents([
-            (e) => {
-                const target = e.target;
-
-                while (target.className != 'task-item') {
-                    target = target.parentElement;
-                }
-
-                modal.open(this.columnId, this.id, this.content);
-            },
-            () => {
-                const columnData = this.elements.root.parentElement.getElementsByClassName('task-item');
-
-                columnData.forEach((columnItem, index, list) => {
-
-                    if (columnItem.dataset.id > item.id) {
-                        list[index].dataset.id -= 1;
-                    }
-        
-                });
-        
-                columnData[this.id].parentNode.removeChild(columnData[this.id]);
-                Data.deleteItem(this.id, this.columnId);
-            }
-        ]);
+        this.id = (!id) ? ID.generateID() : id;
     }
-    
-    get element() {
-        const element = document.createElement('div');
-        element.className = 'task-item';
-        element.dataset.id = this.id;
-        element.dataset.columnId = this.columnId;
-        element.innerHTML = `
+
+    createElements() {
+        const fragment = new DocumentFragment();
+        const root = document.createElement('div');
+
+        root.className = 'task-item';
+        root.dataset.id = this.id;
+        root.dataset.columnId = this.columnId;
+        root.innerHTML = `
             <div class="task-item-inner">
                 <button class="btn-delete-task">x</button>
                 <h3 class="task-item-title">${this.content.title}</h3>
@@ -54,11 +24,16 @@ export default class Task {
             </div>
             
             `;
-        return element;
-    }
+        
+        fragment.append(root);
 
-    _setEvents(funcs) {
-        this.elements.root.addEventListener('click', funcs[0]);
-        this.elements.btnDeleteTask.addEventListener('click', funcs[1]);
+        const elements = {}
+        elements.fragment = fragment;
+        elements.root = fragment.children[0];
+        elements.title = elements.root.querySelector('.task-item-title');
+        elements.description = elements.root.querySelector('.task-item-description');
+        elements.btnDeleteTask = elements.root.querySelector('.btn-delete-task');
+        
+        return elements;
     }
 }
