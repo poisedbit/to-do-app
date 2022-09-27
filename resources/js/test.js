@@ -5,7 +5,7 @@ import Task from "./view/task.js";
     const keyName = 'test-data';
     const testItems = load(keyName);
 
-    if (testItems.length !== 0) {
+    if (testItems.length) {
         return;
     }
 
@@ -22,15 +22,16 @@ import Task from "./view/task.js";
         }
 
         content.title = `Title number ${i}`;
-        content.description = `This is a description with a number of ${i}.`;
+        content.description = `This is a description with the number ${i}.`;
         
         const item = new Task(content, columnId);
         
         testItems.push(item);
-        Data.insertItem(item, item.columnId);
     }
-
+    
     save(keyName, testItems);
+
+    testItems.forEach(test => Data.insertItem(test, test.columnId));
 }
 
 function load(keyName) {

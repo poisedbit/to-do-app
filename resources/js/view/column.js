@@ -33,15 +33,22 @@ export default class Column {
     }
 
     addNewItem(data) {
-        const item = new Task(data.newContent, data.columnId);
-        const items = this._data.items;
-        const elements = this._data.elements;
-        const index = items.findIndex(i => i.id === item.id);
 
-        items.push(item);
-        elements.push(item.createElements());
-        this._setItemEvents(item, elements[index]);
-        this._elements.container.appendChild(elements[index].fragment);
+        if (data.newContent.title === '' || data.newContent === '') {
+            return
+        }
+
+        const item = new Task(data.newContent, data.columnId);
+        const columnItems = this._data.items;
+        const columnElements = this._data.elements;
+
+        columnItems.push(item);
+        columnElements.push(item.createElements());
+
+        const index = columnItems.findIndex(i => i.id === item.id);
+
+        this._setItemEvents(item, columnElements[index]);
+        this._elements.container.appendChild(columnElements[index].fragment);
         Data.insertItem(item, this._id);
     }
 
@@ -51,7 +58,8 @@ export default class Column {
         const elements = this._data.elements[index];
 
         if (JSON.stringify(data.newContent) === JSON.stringify(item.content)) {
-            return console.log('content is the same');
+            this.showItem(item, 1);
+            return
         }
 
         item.content = data.newContent;
@@ -60,24 +68,53 @@ export default class Column {
         Data.updateItem(item.id, this._id, item.content);
     }
 
+    showItem(item, view) {
+        const index = this._data.items.findIndex(i => i.id === item.id);
+        const root = this._data.elements[index].root;
+
+        switch (view) {
+            case 0: 
+                root.style.visibility = 'hidden';
+                break;
+            case 1:
+                root.style.visibility = 'visible';
+                break;
+            default:
+                break;
+        }
+    }
+
     _setItemEvents(item, elements) {
         elements.root.addEventListener('click', (e) => {
             let target = e.target;
+
+            if (target != elements.btnDeleteTask){
+
+                while (target.className !== 'task-item') {
+                    target = target.parentElement;
+                }
                 
-            while (target.className !== 'task-item') {
-                target = target.parentElement;
+                this.showItem(item, 0);
+                modal.open(this._id, item);
             }
-    
-            modal.open(this._id, item);
         });
 
         elements.btnDeleteTask.addEventListener('click', () => {
-            const index = this._data.items.findIndex(i => i.id === item.id);
+            this._deleteItem(item, elements);
+        })
+    }
 
-            this._elements.container.removeChild(this._data.elements[index].root);
+    _deleteItem(item, elements) {
+        
+        if (confirm('Are you sure you want to delete this task?')) {
+            const index = this._data.items.findIndex(i => i.id === item.id);
+            const root = elements.root;
+
+            this._elements.container.removeChild(root);
             this._data.items.splice(index, 1);
             this._data.elements.splice(index, 1);
-            Data.deleteItem(item.id, this._id);
-        })
+            Data.deleteItem(item.id, this._id); 
+        }
+        
     }
 }

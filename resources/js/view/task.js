@@ -14,6 +14,7 @@ export default class Task {
         const root = document.createElement('div');
 
         root.className = 'task-item';
+        root.style.visibility = 'visible';
         root.dataset.id = this.id;
         root.dataset.columnId = this.columnId;
         root.innerHTML = `
