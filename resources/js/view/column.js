@@ -1,76 +1,76 @@
 import Data from "../api/data.js";
-import modal from "./modal.js";
+import ID from "../api/id-log.js";
 import Task from "./task.js";
 
 export default class Column {
+    #id;
+    #elements = {};
+    #data = [];
+    #modal;
+
     constructor(id, domId) {
-        this._id = id;
-        this._data = {}
-        this._data.items = []
-        this._data.elements = []
+        this.#id = id;
+        this.#elements.root = document.getElementById(domId);
+        this.#elements.container = this.#elements.root.querySelector('.task-container');
+        this.#elements.btnAddItem = this.#elements.root.querySelector('.btn-add-task');
+        this.#elements.root.dataset.id = id;
 
-        Data.getItems(this._id).forEach(item => this._data.items.push(new Task(item.content, item.columnId, item.id)));
-        this._data.items.forEach(item => this._data.elements.push(item.createElements()));
-        
-        this._elements = {};
-        this._elements.root = document.getElementById(domId);
-        this._elements.container = this._elements.root.querySelector('.task-container');
-        this._elements.btnAddItem = this._elements.root.querySelector('.btn-add-task');
-        this._elements.root.dataset.id = id;
+        this.#elements.btnAddItem.addEventListener('click', (e) => {
+            this.#modal.open(this.#id);
+        });
 
-        this._elements.btnAddItem.addEventListener('click', (e) => {
-            modal.open(this._id);
+        Data.getItems(this.#id).forEach(item => {
+            this.#data.push(new Task(item.content, item.id));
+
+            if (!ID.log.includes(item.id)) {
+                ID.insertID(item.id);
+            }
         });
     }
 
     get id() {
-        return this._id;
+        return this.#id;
+    }
+
+    set modal(modal) {
+        this.#modal = modal;
     }
 
     renderItems() {
-        this._data.elements.forEach((e, index) => this._setItemEvents(this._data.items[index], e));
-        this._data.elements.forEach(e => this._elements.container.appendChild(e.fragment));
+        this.#data.forEach(item => this.#setItemEvents(item));
+        this.#data.forEach(item => this.#elements.container.appendChild(item.elements.fragment));
     }
 
-    addNewItem(data) {
+    addNewItem(content) {
 
-        if (data.newContent.title === '' || data.newContent === '') {
+        if (content.title === '' || content.description === '') {
             return
         }
 
-        const item = new Task(data.newContent, data.columnId);
-        const columnItems = this._data.items;
-        const columnElements = this._data.elements;
+        const item = new Task(content);
 
-        columnItems.push(item);
-        columnElements.push(item.createElements());
-
-        const index = columnItems.findIndex(i => i.id === item.id);
-
-        this._setItemEvents(item, columnElements[index]);
-        this._elements.container.appendChild(columnElements[index].fragment);
-        Data.insertItem(item, this._id);
+        this.#data.push(item);
+        this.#setItemEvents(item);
+        this.#elements.container.appendChild(item.elements.fragment);
+        Data.insertItem(item, this.#id);
     }
 
-    updateItem(data) {
-        const index = this._data.items.findIndex(i => i.id === data.id);
-        const item = this._data.items[index];
-        const elements = this._data.elements[index];
+    updateItem(id, newContent) {
+        const item = this.#data.find(item => item.id === id);
 
-        if (JSON.stringify(data.newContent) === JSON.stringify(item.content)) {
-            this.showItem(item, 1);
+        if (JSON.stringify(newContent) === JSON.stringify(item.content)) {
+            this.showItem(item.id, 1);
             return
         }
 
-        item.content = data.newContent;
-        elements.title.textContent = item.content.title;
-        elements.description.textContent = item.content.description;
-        Data.updateItem(item.id, this._id, item.content);
+        item.content = newContent;
+        item.elements.title.textContent = item.content.title;
+        item.elements.description.textContent = item.content.description;
+        Data.updateItem(item.id, this.#id, item.content);
     }
 
-    showItem(item, view) {
-        const index = this._data.items.findIndex(i => i.id === item.id);
-        const root = this._data.elements[index].root;
+    showItem(id, view) {
+        const root = this.#data.find(i => i.id === id).elements.root;
 
         switch (view) {
             case 0: 
@@ -84,36 +84,37 @@ export default class Column {
         }
     }
 
-    _setItemEvents(item, elements) {
-        elements.root.addEventListener('click', (e) => {
+    #setItemEvents(item) {
+        item.elements.root.addEventListener('click', e => {
             let target = e.target;
 
-            if (target != elements.btnDeleteTask){
+            if (target != item.elements.btnDeleteTask){
 
                 while (target.className !== 'task-item') {
                     target = target.parentElement;
                 }
                 
-                this.showItem(item, 0);
-                modal.open(this._id, item);
+                this.showItem(item.id, 0);
+                this.#modal.open(this.#id, item);
             }
         });
 
-        elements.btnDeleteTask.addEventListener('click', () => {
-            this._deleteItem(item, elements);
-        })
+        item.elements.root.addEventListener('dragstart', e => {
+            e.dataTransfer.setData('text/plain', item.id);
+        });
+
+        item.elements.btnDeleteTask.addEventListener('click', () => this.#deleteItem(item));
     }
 
-    _deleteItem(item, elements) {
+    #deleteItem(item) {
         
         if (confirm('Are you sure you want to delete this task?')) {
-            const index = this._data.items.findIndex(i => i.id === item.id);
-            const root = elements.root;
+            const index = this.#data.findIndex(i => i.id === item.id);
+            const root = item.elements.root;
 
-            this._elements.container.removeChild(root);
-            this._data.items.splice(index, 1);
-            this._data.elements.splice(index, 1);
-            Data.deleteItem(item.id, this._id); 
+            this.#elements.container.removeChild(root);
+            this.#data.splice(index, 1);
+            Data.deleteItem(item.id, this.#id); 
         }
         
     }

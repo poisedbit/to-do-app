@@ -3,28 +3,27 @@
 import ID from "../api/id-log.js";
 
 export default class Task {
-    constructor (content, columnId, id = null) {
-        this.content = content;
-        this.columnId = columnId;
+    constructor (content, id = null) {
         this.id = (!id) ? ID.generateID() : id;
+        this.content = content;
+        this.elements = this.#createElements();
     }
 
-    createElements() {
+    #createElements() {
         const fragment = new DocumentFragment();
         const root = document.createElement('div');
 
         root.className = 'task-item';
-        root.style.visibility = 'visible';
         root.dataset.id = this.id;
-        root.dataset.columnId = this.columnId;
+        root.draggable = true;
         root.innerHTML = `
             <div class="task-item-inner">
                 <button class="btn-delete-task">x</button>
                 <h3 class="task-item-title">${this.content.title}</h3>
                 <p class="task-item-description">${this.content.description}</p>
             </div>
-            
-            `;
+        `;
+        root.style.visibility = 'visible';
         
         fragment.append(root);
 

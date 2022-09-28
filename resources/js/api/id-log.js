@@ -1,10 +1,10 @@
 "use strict";
 
 export default class ID {
-    static _keyName = 'id-log';
+    static #keyName = 'id-log';
 
     static get log() {
-        return load(this._keyName);
+        return load(this.#keyName);
     }
 
     static generateID() {
@@ -22,7 +22,7 @@ export default class ID {
         const log = this.log;
 
         log.push(id);
-        save(this._keyName, log);
+        save(this.#keyName, log);
     }
 
     static deleteID(id) {
@@ -30,7 +30,7 @@ export default class ID {
         const index = log.indexOf(id);
 
         log.splice(index, 1);
-        save(this._keyName, log);
+        save(this.#keyName, log);
     }
 }
 

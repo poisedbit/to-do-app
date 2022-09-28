@@ -1,69 +1,89 @@
 "use strict";
 
-const modal = {
-    elements: {
-        root: document.getElementById('modal'),
-        content: {
-            title: document.getElementById('modal-title'),
-            description: document.getElementById('modal-description')
+export default class Modal {
+    #elements = {}
+    #selectedItem = {}
+
+    constructor(columns) {
+        this.#elements.root = document.getElementById('modal');
+        this.#elements.title = document.getElementById('modal-title');
+        this.#elements.description = document.getElementById('modal-description');
+        this.#events = this.#getListeners(columns);
+    }
+
+    open(columnID, item = null) {
+        this.#content = ['', ''];
+        this.#selectedItem.columnID = columnID;
+        this.#selectedItem.isNew = true;
+
+        if (item != null) {
+            this.#content = [item.content.title, item.content.description];
+            this.#selectedItem.id = item.id;
+            this.#selectedItem.isNew = false;
+        }
+
+        this.#show(1);
+    }
+
+    set #events([onBlur, close]) {
+        this.#elements.title.addEventListener('blur', onBlur);
+        this.#elements.description.addEventListener('blur', onBlur);
+        document.addEventListener('click', close);
+    }
+
+    #getListeners(columns) {
+        const onBlur = () => {
+            const item = this.#selectedItem;
+            const newContent = this.#content;
+
+            if (!item.isNew) {
+                columns.find(c => c.id === item.columnID).
+                        updateItem(item.id, newContent);
+            }
+        }
+
+        const close = (e) => {
+            if (e.target.id === 'modal') {
+                this.#show(0);
+
+                const item = this.#selectedItem;
+                const newContent = this.#content;
+
+                if (item.isNew) {
+                    columns.find(c => c.id === item.columnID).
+                            addNewItem(newContent);
+                } else {
+                    columns.find(c => c.id === item.columnID).
+                            showItem(item.id, 1);
+                }
+            }
+        }
+
+        return [onBlur, close];
+    }
+
+    #show(view) {
+        switch (view) {
+            case 0:
+                this.#elements.root.style.visibility = 'hidden';
+                break;
+            case 1:
+                this.#elements.root.style.visibility = 'visible';
+                break;
+            default:
+                break;
         }
     }
-}
 
-modal.item = {}
-
-modal.getContent = () => {
-    return {
-        title: modal.elements.content.title.textContent.trim(),
-        description: modal.elements.content.description.textContent.trim()
-    }
-}
-
-modal.setContent = (title, description) => {
-    modal.elements.content.title.textContent = title;
-    modal.elements.content.description.textContent = description;
-}
-
-modal.getData = () => {
-    return {
-        id: modal.item.id,
-        columnId: modal.item.columnId,
-        newContent: modal.getContent(),
-        isNew: modal.item.isNew
-    }
-}
-
-modal.setEvents = (func, func1) => {
-    modal.elements.content.title.addEventListener('blur', func);
-    modal.elements.content.description.addEventListener('blur', func);
-    document.addEventListener('click', func1);
-}
-
-modal.show = (view) => {
-    switch (view) {
-        case 0: 
-            modal.elements.root.style.visibility = 'hidden';
-            break;
-        case 1:
-            modal.elements.root.style.visibility = 'visible';
-            break;
-        default:
-            break;
-    }
-}
-
-modal.open = (columnId, item = null) => {
-    modal.setContent('', '');
-    modal.item.columnId = columnId;
-    modal.item.isNew = true;                     // true if a new item's being created, false otherwise
-    
-    if (item != null) {
-        modal.setContent(item.content.title, item.content.description)
-        modal.item.id = item.id;
-        modal.item.isNew = false;
+    get #content() {
+        return {
+            title: this.#elements.title.textContent.trim(),
+            description: this.#elements.description.textContent.trim()
+        }
     }
 
-    modal.show(1);
+    set #content([title, description]) {
+        this.#elements.title.textContent = title;
+        this.#elements.description.textContent = description;
+    }
 }
-
-export default modal;

@@ -1,24 +1,28 @@
 import ID from "./id-log.js";
 
 export default class Data {
-    static _keyName = 'task-items';
+    static #keyName = 'task-items';
 
-    static insertItem(item, columnId) {
-        const data = load(this._keyName);
-        const column = data[columnId];
+    static insertItem(item, columnID) {
+        const data = load(this.#keyName);
+        const column = data[columnID];
 
         if (!column) {
-            data[columnId] = [];
+            data[columnID] = [];
         }
         
-        column.push(item);
+        column.push({
+            id: item.id,
+            content: item.content
+        });
+
         ID.insertID(item.id);
-        save(this._keyName, data);
+        save(this.#keyName, data);
     }
     
-    static getItems(columnId) {
-        const data = load(this._keyName);
-        const column = data[columnId];
+    static getItems(columnID) {
+        const data = load(this.#keyName);
+        const column = data[columnID];
 
         if (!column) {
             return [];
@@ -27,22 +31,22 @@ export default class Data {
         return column;
     }
 
-    static updateItem(id, columnId, newContent) {
-        const data = load(this._keyName);
-        const column = data[columnId];
-
+    static updateItem(id, columnID, newContent) {
+        const data = load(this.#keyName);
+        const column = data[columnID];
+        
         column.find(item => item.id === id).content = newContent;
-        save(this._keyName, data);
+        save(this.#keyName, data);
     }
 
-    static deleteItem(id, columnId) {
-        const data = load(this._keyName);
-        const column = data[columnId];
-        const index = column.findIndex(item => item.id === id);
+    static deleteItem(id, columnID) {
+        const data = load(this.#keyName);
+        const column = data[columnID];
+        const index = column.findIndex(i => i.id === id);
 
         column.splice(index, 1);
         ID.deleteID(id);
-        save(this._keyName, data);
+        save(this.#keyName, data);
     }
 }
 
@@ -52,7 +56,7 @@ function load(keyName) {
     if (!jsonData) {
         return {
             todo: [],
-            inProgress: [],
+            inprogress: [],
             complete: []
         }
     }

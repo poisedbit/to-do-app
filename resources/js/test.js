@@ -11,27 +11,26 @@ import Task from "./view/task.js";
 
     for (let i = 1; i < 10; i++) {
         const content = {}
-        let columnId;
+        let column;
 
         if (i <= 3) {
-            columnId = 'todo';
+            column = 'todo';
         } else if (i > 3 && i <= 6) {
-            columnId = 'inProgress';
+            column = 'inprogress';
         } else {
-            columnId = 'complete';
+            column = 'complete';
         }
 
         content.title = `Title number ${i}`;
         content.description = `This is a description with the number ${i}.`;
         
-        const item = new Task(content, columnId);
+        const item = new Task(content);
         
-        testItems.push(item);
+        testItems.push({item: item, column: column});
     }
     
     save(keyName, testItems);
-
-    testItems.forEach(test => Data.insertItem(test, test.columnId));
+    testItems.forEach(test => Data.insertItem(test.item, test.column));
 }
 
 function load(keyName) {
