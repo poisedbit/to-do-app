@@ -8,7 +8,7 @@ export default class Modal {
         this.#elements.root = document.getElementById('modal');
         this.#elements.title = document.getElementById('modal-title');
         this.#elements.description = document.getElementById('modal-description');
-        this.#events = this.#getListeners(columns);
+        this.#setEvents(this.#getListeners(columns));
     }
 
     open(columnID, item = null) {
@@ -25,7 +25,7 @@ export default class Modal {
         this.#show(1);
     }
 
-    set #events([onBlur, close]) {
+    #setEvents([onBlur, close]) {
         this.#elements.title.addEventListener('blur', onBlur);
         this.#elements.description.addEventListener('blur', onBlur);
         document.addEventListener('click', close);
@@ -38,7 +38,7 @@ export default class Modal {
 
             if (!item.isNew) {
                 columns.find(c => c.id === item.columnID).
-                        updateItem(item.id, newContent);
+                    updateItem(item.id, newContent);
             }
         }
 
@@ -51,10 +51,10 @@ export default class Modal {
 
                 if (item.isNew) {
                     columns.find(c => c.id === item.columnID).
-                            addNewItem(newContent);
+                        addNewItem(newContent);
                 } else {
                     columns.find(c => c.id === item.columnID).
-                            showItem(item.id, 1);
+                        getItem(item.id).show(1);
                 }
             }
         }

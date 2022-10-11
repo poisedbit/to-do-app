@@ -2,7 +2,10 @@
     --header-height: 5.5rem;
     --footer-height: 1.5rem;
     --main-height: calc(100vh - var(--header-height) - var(--footer-height));
-    --task-width: calc(100%/3);
+    --task-column-width: calc(100%/3);
+    
+    --dark-bg: rgb(24, 24, 24);
+    --task-color: rgb(243, 230, 205);
 }
 
 * {
@@ -17,8 +20,8 @@ html {
 }
 
 body {
-    background-color: rgb(24, 24, 24);
-    color: rgb(243, 230, 205);
+    background-color: var(--dark-bg);
+    color: var(--task-color);
     display: grid;
     grid-template-columns: repeat(12, 1fr);
 }
@@ -26,7 +29,6 @@ body {
 header {
     grid-column: 2 / span 10;
     height: 5.5rem;
-    border: 1px solid red;
 }
 
 header h1 {
@@ -43,25 +45,28 @@ main {
 footer {
     grid-column: 2 / span 10;
     height: 1.5rem;
-    border: 1px solid orange;
+}
+
+.task-column {
+    width: var(--task-column-width);
 }
 
 .task-item {
-    background-color: rgb(243, 230, 205) !important;
-    color: rgb(24, 24, 24) !important;
+    color: black !important;
+}
+
+.task-item-inner {
+    background-color: var(--task-color) !important;
     padding: 2rem;
 }
 
-#task-todo {
-    width: var(--task-width);
+.dropzone {
+    height: .5rem;
 }
 
-#task-in-progress {
-    width: var(--task-width);
-}
-
-#task-complete {
-    width: var(--task-width);
+.dropzone-active {
+    background-color: black;
+    height: 3.5rem;
 }
 
 #modal {
@@ -77,7 +82,7 @@ footer {
 }
 
 #modal-inner {
-    background-color: white;
+    background-color: var(--task-color);
     border-radius: 5px;
     width: 30rem;
     max-height: 95vh;

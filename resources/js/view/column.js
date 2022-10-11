@@ -1,5 +1,6 @@
 import Data from "../api/data.js";
 import ID from "../api/id-log.js";
+import DropZone from "./dropzone.js";
 import Task from "./task.js";
 
 export default class Column {
@@ -8,18 +9,22 @@ export default class Column {
     #data = [];
     #modal;
 
-    constructor(id, domId) {
+    constructor(id) {
         this.#id = id;
-        this.#elements.root = document.getElementById(domId);
-        this.#elements.container = this.#elements.root.querySelector('.task-container');
+        this.#elements.root = document.querySelector(`[data-id="${id}"]`);
         this.#elements.btnAddItem = this.#elements.root.querySelector('.btn-add-task');
+        this.#elements.container = this.#elements.root.querySelector('.task-container');
         this.#elements.root.dataset.id = id;
 
+        const topDropZone = DropZone.create();
+
+        this.#elements.container.appendChild(topDropZone);
+
         this.#elements.btnAddItem.addEventListener('click', (e) => {
-            this.#modal.open(this.#id);
+            this.#modal.open(id);
         });
 
-        Data.getItems(this.#id).forEach(item => {
+        Data.getItems(id).forEach(item => {
             this.#data.push(new Task(item.content, item.id));
 
             if (!ID.log.includes(item.id)) {
@@ -32,6 +37,14 @@ export default class Column {
         return this.#id;
     }
 
+    get elements() {
+        return this.#elements;
+    }
+
+    get data() {
+        return this.#data;
+    }
+
     set modal(modal) {
         this.#modal = modal;
     }
@@ -42,7 +55,6 @@ export default class Column {
     }
 
     addNewItem(content) {
-
         if (content.title === '' || content.description === '') {
             return
         }
@@ -52,36 +64,20 @@ export default class Column {
         this.#data.push(item);
         this.#setItemEvents(item);
         this.#elements.container.appendChild(item.elements.fragment);
-        Data.insertItem(item, this.#id);
+        Data.insertItem(item, this.id);
     }
-
+    
     updateItem(id, newContent) {
-        const item = this.#data.find(item => item.id === id);
-
-        if (JSON.stringify(newContent) === JSON.stringify(item.content)) {
-            this.showItem(item.id, 1);
-            return
-        }
+        const item = this.getItem(id);
 
         item.content = newContent;
         item.elements.title.textContent = item.content.title;
         item.elements.description.textContent = item.content.description;
-        Data.updateItem(item.id, this.#id, item.content);
+        Data.updateItem(item.id, this.id, [item.content]);
     }
 
-    showItem(id, view) {
-        const root = this.#data.find(i => i.id === id).elements.root;
-
-        switch (view) {
-            case 0: 
-                root.style.visibility = 'hidden';
-                break;
-            case 1:
-                root.style.visibility = 'visible';
-                break;
-            default:
-                break;
-        }
+    getItem(id) {
+        return this.#data.find(item => item.id === id);
     }
 
     #setItemEvents(item) {
@@ -94,8 +90,8 @@ export default class Column {
                     target = target.parentElement;
                 }
                 
-                this.showItem(item.id, 0);
-                this.#modal.open(this.#id, item);
+                item.show(0);
+                this.#modal.open(this.id, item);
             }
         });
 
@@ -107,15 +103,13 @@ export default class Column {
     }
 
     #deleteItem(item) {
-        
         if (confirm('Are you sure you want to delete this task?')) {
             const index = this.#data.findIndex(i => i.id === item.id);
             const root = item.elements.root;
 
             this.#elements.container.removeChild(root);
             this.#data.splice(index, 1);
-            Data.deleteItem(item.id, this.#id); 
+            Data.deleteItem(item.id, this.id); 
         }
-        
     }
 }

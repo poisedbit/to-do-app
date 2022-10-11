@@ -1,12 +1,28 @@
 "use strict";
 
 import ID from "../api/id-log.js";
+import DropZone from "./dropzone.js";
 
 export default class Task {
     constructor (content, id = null) {
         this.id = (!id) ? ID.generateID() : id;
         this.content = content;
         this.elements = this.#createElements();
+        this.elements.drop = DropZone.create();
+        this.elements.root.append(this.elements.drop);
+    }
+
+    show(view) {
+        switch(view) {
+            case 0:
+                this.elements.root.style.visibility = 'hidden';
+                break;
+            case 1:
+                this.elements.root.style.visibility = 'visible';
+                break;
+            default:
+                break;
+        }
     }
 
     #createElements() {

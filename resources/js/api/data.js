@@ -31,11 +31,20 @@ export default class Data {
         return column;
     }
 
-    static updateItem(id, columnID, newContent) {
+    static updateItem(id, columnID, [newContent, newPosition, targetColumnID]) {
         const data = load(this.#keyName);
         const column = data[columnID];
+        const item = column.find(item => item.id === id);
+
+        item.content = (newContent == undefined) ? item.content : newContent;
+
+        if (targetColumnID !== undefined && newPosition !== undefined) {
+            const targetColumn = data[targetColumnID];
+
+            column.splice(column.indexOf(item), 1);
+            targetColumn.splice(newPosition, 0, item);
+        }
         
-        column.find(item => item.id === id).content = newContent;
         save(this.#keyName, data);
     }
 
