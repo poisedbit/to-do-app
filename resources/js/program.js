@@ -1,6 +1,5 @@
 "use strict";
 
-import test from "./test.js";
 import Column from "./view/column.js";
 import DropZone from "./view/dropzone.js";
 import Modal from "./view/modal.js";
@@ -18,9 +17,5 @@ function main() {
     DropZone.columns = columns;
     columns.forEach(c => c.renderItems());
 }
-
-/*
-    
-*/
 
 main();
