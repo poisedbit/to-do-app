@@ -14,11 +14,15 @@ function main() {
         new Column('complete')
     ]
     
-    const modalDiv = new Modal(columns);
+    Modal.columns = columns;
+    Modal.events = Modal.listeners;
 
     DropZone.columns = columns;
-    columns.forEach(c => c.modal = modalDiv)
     columns.forEach(c => c.renderItems());
 }
+
+/*
+    
+*/
 
 main();

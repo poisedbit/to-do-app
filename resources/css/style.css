@@ -4,8 +4,12 @@
     --main-height: calc(100vh - var(--header-height) - var(--footer-height));
     --task-column-width: calc(100%/3);
     
-    --dark-bg: rgb(24, 24, 24);
-    --task-color: rgb(243, 230, 205);
+    --dark-color: hsl(0, 0%, 9.4%);
+    --grey: hsla(0, 0%, 9.4%, .75);
+    --task-color: hsl(39, 61.3%, 92.5%);
+    --task-color-low: hsla(39, 61.3%, 92.5%, .9);
+    --task-color-lowlow: hsla(39, 61.3%, 92.5%, .7);
+    --task-shadow: hsl(39, 61.3%, 62.5%);
 }
 
 * {
@@ -20,15 +24,16 @@ html {
 }
 
 body {
-    background-color: var(--dark-bg);
+    background-color: var(--dark-color);
     color: var(--task-color);
     display: grid;
     grid-template-columns: repeat(12, 1fr);
 }
 
 header {
-    grid-column: 2 / span 10;
-    height: 5.5rem;
+    grid-column: 3 / span 8;
+    height: var(--header-height);
+    border-bottom: 4px ridge var(--task-color-low);
 }
 
 header h1 {
@@ -37,39 +42,128 @@ header h1 {
 }
 
 main {
-    grid-column: 2 / span 10;
+    grid-column: 3 / span 8;
     min-height: var(--main-height);
     display: flex;
+    column-gap: 1rem;
 }
 
 footer {
-    grid-column: 2 / span 10;
-    height: 1.5rem;
+    grid-column: 3 / span 8;
+    height: var(--footer-height);
+    font-weight: normal;
+}
+
+.btn:hover {
+    cursor: pointer;
 }
 
 .task-column {
+    color: var(--dark-color);
     width: var(--task-column-width);
+    border-radius: 5px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
 }
 
-.task-item {
-    color: black !important;
+.task-column-header {
+    color: var(--task-color-low);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.task-column-title {
+    font-weight: 600;
+}
+
+.btn-add-task {
+    font-size: 3rem;
 }
 
 .task-item-inner {
+    cursor: pointer;
     background-color: var(--task-color) !important;
-    padding: 2rem;
+    border-radius: 5px;
+    padding: .5rem 2rem .5rem .5rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    column-gap: .5rem;
+}
+
+.task-item-inner:hover {
+    box-shadow: -.25rem .5rem var(--task-shadow);
+    transition: box-shadow 150ms ease 0s, transform 150ms ease 0s;
+    transform: translate(.25rem, -.5rem);
+}
+
+.task-item-inner-content {
+    overflow: hidden;
+}
+
+.task-item-title {
+    font-weight: 600;
+}
+
+.task-item-description {
+    color: var(--grey);
+}
+
+.task-item-icon {
+    visibility: hidden;
+}
+
+.task-item-inner:hover .icon-hidden {
+    visibility: visible;
+}
+
+.btn-delete {
+    position: absolute;
+    top: .5rem;
+    right: .5rem;
+    visibility: hidden;
+}
+
+.icon-drag-handle {
+    cursor: grab;
+    color: hsla(0, 0%, 9.4%, .5);
+    font-size: 2rem;
 }
 
 .dropzone {
-    height: .5rem;
+    height: 1.5rem;
+    transition: height 200ms;
 }
 
 .dropzone-active {
-    background-color: black;
-    height: 3.5rem;
+    border-radius: 5px;
+    height: 10rem;
+}
+
+.repository-link {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    column-gap: .25rem;
+}
+
+.repository-link:visited {
+    color: var(--task-color);
+}
+
+.repository-link:hover {
+    color: var(--task-color-lowlow);
+}
+
+.repository-link h4{
+    font-weight: normal;
 }
 
 #modal {
+    color: var(--dark-color);
     background-color: rgba(0, 0, 0, .5);
     width: 100%;
     height: 100vh;
@@ -82,7 +176,7 @@ footer {
 }
 
 #modal-inner {
-    background-color: var(--task-color);
+    background-color: var(--task-color-low);
     border-radius: 5px;
     width: 30rem;
     max-height: 95vh;
@@ -91,6 +185,28 @@ footer {
 }
 
 #modal-content {
-    color: black;
-    padding: 0 1.5rem;
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+#modal-title, #modal-description {
+    background-color: var(--task-low);
+    padding: .5rem;
+    resize: none;
+    overflow-wrap: break-word;
+    outline: none;
+}
+
+#modal-title {
+    border-radius: 5px 5px 0 0;
+    font-weight: 600;
+    border: none;
+    border-bottom: 1px dashed var(--dark-color);
+}
+
+#modal-description {
+    color: var(--grey);
+    border-radius: 0 0 5px 5px;
+    border: none;
 }

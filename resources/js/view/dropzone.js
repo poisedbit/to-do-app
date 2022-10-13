@@ -6,10 +6,26 @@ export default class DropZone {
     static create() {
         const root = document.createElement('div');
         
-        root.className = 'dropzone'
+        root.className = 'dropzone';
 
         root.addEventListener('dragover', e => {
             e.preventDefault();
+
+            const dropZonesArr = Array.from(root.closest('.task-column').querySelectorAll('.dropzone'));
+            const receiverPosition = dropZonesArr.indexOf(root);
+            const itemID = Number(e.dataTransfer.getData('text/plain'));
+            const transferColumnID = document.querySelector(`[data-id="${itemID}"]`).closest('.task-column').dataset.id;
+            const receiverColumnID = root.closest('.task-column').dataset.id;
+            const itemIndex = Array.from(document.querySelector(`[data-id="${transferColumnID}"]`).querySelectorAll('.task-item')).findIndex(i => i.dataset.id == itemID);
+
+            if (document.querySelector(`[data-id="${itemID}"]`).contains(root)) {
+                return;
+            }
+
+            if ((transferColumnID === receiverColumnID) && ((receiverPosition === 0 && itemIndex === 0) || receiverPosition === itemIndex)) {
+                return;
+            }
+
             root.classList.add('dropzone-active');
         });
 
@@ -23,8 +39,7 @@ export default class DropZone {
 
             const dropZonesArr = Array.from(root.closest('.task-column').querySelectorAll('.dropzone'));
             const receiverPosition = dropZonesArr.indexOf(root);
-            const insertAfter = root.parentElement.classList.contains('.task-item') ? root.parentElement : root;
-
+            const insertAfter = (receiverPosition === 0) ? root : root.parentElement;
             const itemID = Number(e.dataTransfer.getData('text/plain'));
             const transferColumnID = document.querySelector(`[data-id="${itemID}"]`).closest('.task-column').dataset.id;
             const transferColumn = this.columns.find(c => c.id === transferColumnID);
@@ -42,8 +57,11 @@ export default class DropZone {
             }
 
             transferColumn.data.splice(itemIndex, 1);
+            item.columnID = receiverColumn.id;
             receiverColumn.data.splice(receiverPosition, 0, item);
             insertAfter.after(item.elements.root);
+            console.log([transferColumn.data, receiverColumn.data]);
+            console.log([transferColumn, receiverColumn])
             Data.updateItem(item.id, transferColumnID, [null, receiverPosition, receiverColumnID]);
         });
 
