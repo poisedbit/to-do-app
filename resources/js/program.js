@@ -6,8 +6,6 @@ import DropZone from "./view/dropzone.js";
 import Modal from "./view/modal.js";
 
 function main() {
-    test();
-
     const columns = [
         new Column('todo'),
         new Column('inprogress'),
